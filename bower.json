@@ -1,0 +1,21 @@
+{
+  "name": "voice-chat",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Piotr <siwinski.piotr@outlook.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/piotrsiwinski/voice-chat-app",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1"
+  }
+}
