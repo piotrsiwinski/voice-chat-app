@@ -1,16 +1,24 @@
 function configureServerSocket(io){
+
     var connections = new Array();
+    var rooms = new Array();
 
     io.sockets.on('connection', function (socket) {
-
         console.log("Klient '" + socket.id +"' dołączył się do serwera");
 
-        socket.on('hello', function(){
-            var _ids = new Array();
-            Object.keys(io.sockets.connected).forEach(function(c) {
-                if(c != socket.id) _ids.push(c);
-            });
-            socket.emit('hello', _ids);
+        socket.on('hello', function(roomName){
+            
+            socket.join(roomName);
+            rooms.push({client: socket.id, roomName: roomName});
+            console.log("Klient '" + socket.id +"' dołączył do pokoju '" + roomName + "'");
+
+            var peers = [], room = io.sockets.adapter.rooms[roomName];
+            if (room) {
+                Object.keys(room.sockets).forEach( function(id){ if(id == socket.id) return;
+                    peers.push(id);
+                });
+            }
+            socket.emit('hello', peers);
         });
 
         socket.on('offer', function(dane){
@@ -31,7 +39,6 @@ function configureServerSocket(io){
         });
 
         socket.on('disconnect', function() {
-            console.log("Klient '" + socket.id +"' odłączył się od serwera");
 
             let connectionsToRemove = new Array();
 
@@ -48,6 +55,14 @@ function configureServerSocket(io){
             connectionsToRemove.forEach(function(connection) {
                 let n = connections.indexOf(connection); connections.splice(n, 1);  
             }, this);
+
+            rooms.forEach(function(room) { if(room.client != socket.id) return;
+                socket.leave(room.roomName); 
+                let n = rooms.indexOf(room); rooms.splice(n, 1);
+                console.log("Klient '" + socket.id +"' opuścił pokój '" + room.roomName + "'");   
+            }, this);
+
+            console.log("Klient '" + socket.id +"' odłączył się od serwera");
         });
     });
 }

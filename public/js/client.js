@@ -11,7 +11,7 @@ navigator.mediaDevices.getUserMedia({
     document.getElementById("localVideo").srcObject = stream;
     window.localStream = stream;
 
-    socket.emit('hello');
+    socket.emit('hello', 'Test'); // <-- 'Test' - nazwa pokoju
   })
   .catch(function(e) {
     console.log('getUserMedia() error: ', e);
