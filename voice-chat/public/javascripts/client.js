@@ -1,4 +1,4 @@
-var socket = io.connect('http://localhost:8080');
+var socket = io.connect('http://localhost:3000');
 
 /***********************************************************************************************************************/
 /* DOSTĘP DO MULTIMEDIÓW - UTWORZENIE LOKALNEGO STREAMU I WYŚWIETLENIE GO */
