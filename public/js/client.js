@@ -1,9 +1,15 @@
 $(document).ready(onDocumentReady);
+
 function onDocumentReady(){
-    $("#start-chat-button").click(startChatOnClick);
+    $("#start-chat-button").click(startChatButtonOnClick);
 }
 
-function startChatOnClick() {
+function startChatButtonOnClick(){
+    configureSocketIO();
+    $(this).hide();
+}
+
+function configureSocketIO() {
     var socket = io.connect('http://localhost:3000');
 
     /***********************************************************************************************************************/
@@ -18,9 +24,8 @@ function startChatOnClick() {
             window.localStream = stream;
             var url = window.location.href.split("/");
             var roomName = url[url.length-1];
-            console.log(`Room name ${roomName}`);
 
-            socket.emit('hello', roomName); // <-- 'Test' - nazwa pokoju
+            socket.emit('hello', roomName);
         })
         .catch(function (e) {
             console.log('getUserMedia() error: ', e);
