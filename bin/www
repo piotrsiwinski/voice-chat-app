@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/**
+ * Module configuration.
+ */
+require('./../config/config');
 
 /**
  * Module dependencies.
@@ -12,8 +16,7 @@ let {serverSocketIO} = require('./../video/server');
 /**
  * Get port from environment and store in Express.
  */
-
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT);
 app.set('port', port);
 
 /**

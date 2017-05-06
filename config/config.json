@@ -1,0 +1,12 @@
+{
+  "test": {
+    "PORT": 3000,
+    "MONGODB_URI": "mongodb://localhost:27017/DbTest",
+    "JWT_SECRET": "secret"
+  },
+  "development": {
+    "PORT": 3000,
+    "MONGODB_URI": "mongodb://localhost:27017/DbDev",
+    "JWT_SECRET": "secret"
+  }
+}
