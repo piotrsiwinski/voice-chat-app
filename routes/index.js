@@ -6,10 +6,6 @@ router.get('/', function(req, res, next) {
   res.render('home/index', { title: 'Express' });
 });
 
-router.get('/chat', (req, res)=>{
-  res.render('home/chat', {title: 'Chat'});
-});
-
 router.get('/about', (req, res, next)=>{
   res.render('home/about', {title: 'About'});
 });
