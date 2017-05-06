@@ -16,8 +16,11 @@ function startChatOnClick() {
         .then(function (stream) {
             document.getElementById("localVideo").srcObject = stream;
             window.localStream = stream;
+            var url = window.location.href.split("/");
+            var roomName = url[url.length-1];
+            console.log(`Room name ${roomName}`);
 
-            socket.emit('hello', 'Test'); // <-- 'Test' - nazwa pokoju
+            socket.emit('hello', roomName); // <-- 'Test' - nazwa pokoju
         })
         .catch(function (e) {
             console.log('getUserMedia() error: ', e);
