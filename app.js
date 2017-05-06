@@ -10,6 +10,7 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var chat = require('./routes/chat');
 var users = require('./routes/users');
+var {enviroment} = require('./middleware/enviroment');
 
 var app = express();
 
@@ -25,6 +26,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(enviroment);
 
 app.use('/', index);
 app.use('/chat', chat);

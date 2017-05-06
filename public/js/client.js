@@ -10,7 +10,7 @@ function startChatButtonOnClick(){
 }
 
 function configureSocketIO() {
-    var socket = io.connect('http://localhost:3000');
+    var socket = io.connect(window.location.origin);
 
     /***********************************************************************************************************************/
     /* DOSTĘP DO MULTIMEDIÓW - UTWORZENIE LOKALNEGO STREAMU I WYŚWIETLENIE GO */
