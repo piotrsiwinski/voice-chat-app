@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
-var UserSchema = new mongoose.Schema({
+var userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
@@ -24,6 +24,19 @@ var UserSchema = new mongoose.Schema({
 
 });
 
-var User = mongoose.model('User', UserSchema);
+// methods ======================
+// generating a hash
+userSchema.methods.generateHash = function(password) {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+};
+
+// checking if password is valid
+userSchema.methods.validPassword = function(password) {
+  let user = this;
+  return bcrypt.compareSync(password, user.password);
+};
+
+// create the model for users and expose it to our app
+var User = mongoose.model('User', userSchema);
 
 module.exports = {User};

@@ -37,13 +37,30 @@
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li><a href='/'>Home</a></li>
                 <li><a href='/chat'>Chat</a></li>
                 <li><a href='/about'>About</a></li>
                 <li><a href='/contact'>Contact</a></li>
-                <li><a href='/account/login'>Login</a></li>
-                <li><a href='/account/register'>Register</a></li>
+
             </ul>
+            <!-- TODO: Create partial -->
+            {{#if isAuthenticated}}
+                <form method="post" id="logoutForm" action="/account/logout"
+                      class="navbar-right">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="/account/details" title="Manage">Hello!</a>
+                        </li>
+                        <li>
+                            <button type="submit" class="btn btn-link navbar-btn navbar-link">Log out</button>
+                        </li>
+                    </ul>
+                </form>
+            {{else}}
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href='/account/register'>Register</a></li>
+                    <li><a href='/account/login'>Login</a></li>
+                </ul>
+            {{/if}}
         </div>
     </div>
 </div>

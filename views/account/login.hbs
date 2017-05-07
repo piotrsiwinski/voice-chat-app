@@ -1,6 +1,6 @@
 <h2>Login form</h2>
 {{#if message}}
-
+<p class="alert-danger">{{message}}</p>
 {{/if}}
 <div class="row">
     <div class="col-md-8">
@@ -12,7 +12,7 @@
                 <div class="form-group">
                     <label for="Email" class="col-md-2 control-label">Email: </label>
                     <div class="col-md-10">
-                        <input id="Email" type="text" class="form-control" name="email"/>
+                        <input id="Email" type="email" class="form-control" name="email"/>
                         <span class="text-danger"></span>
                     </div>
                 </div>
@@ -20,7 +20,7 @@
                 <div class="form-group">
                     <label for="Password" class="col-md-2 control-label">Password: </label>
                     <div class="col-md-10">
-                        <input id="Password" type="text" class="form-control" name="password"/>
+                        <input id="Password" type="password" class="form-control" name="password"/>
                         <span class="text-danger"></span>
                     </div>
                 </div>

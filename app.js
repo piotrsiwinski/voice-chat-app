@@ -8,35 +8,46 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var flash = require('req-flash');
+var flash = require('connect-flash');
 
-var {passport} = require('./authentication/passport');
+var {passport} = require('./middleware/authentication/passport');
 var {mongoose} = require('./db/mongoose');
+
+// routes
 var index = require('./routes/index');
 var account = require('./routes/account');
 var chat = require('./routes/chat');
 var users = require('./routes/users');
 
 var app = express();
+var session_secret = 'keyboard cat';
 app.use(session({
-  secret: 'keyboard cat',
+  secret: session_secret,
   resave: false,
   saveUninitialized: false
 }));
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+
+// check if user is authenticated
+app.use(function (req, res, next) {
+  res.locals.isAuthenticated = req.isAuthenticated();
+  next();
+});
+
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(cookieParser());
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(cookieParser(session_secret));
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(enviroment);
@@ -45,6 +56,8 @@ app.use('/', index);
 app.use('/chat', chat);
 app.use('/users', users);
 app.use('/account', account);
+
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

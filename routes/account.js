@@ -1,16 +1,13 @@
 var express = require('express');
 var router = express.Router();
-const _ = require('lodash');
-var { User } = require('./../models/user');
-
-var {passport} = require('./../authentication/passport');
+var {passport} = require('../middleware/authentication/passport');
 
 router.get('/login', (req, res) => {
-  res.render('account/login');
+  res.render('account/login', {message: req.flash('error')});
 });
 
 router.post('/login',
-  passport.authenticate('login', {
+  passport.authenticate('local-login', {
     successRedirect: '/',
     failureRedirect: '/account/login',
     failureFlash: true
@@ -18,14 +15,16 @@ router.post('/login',
 );
 
 router.get('/register', (req, res) => {
-  res.render('account/register');
+  res.render('account/register', {message: req.flash('error')});
 });
 
-router.post('/register', (req, res) => {
-  res.redirect('/');
-});
+router.post('/register', passport.authenticate('local-register', {
+  successRedirect: '/',
+  failureRedirect: '/account/register',
+  failureFlash: true
+}));
 
-router.get('/logout', function (req, res) {
+router.post('/logout', function (req, res) {
   req.logout();
   res.redirect('/');
 });
