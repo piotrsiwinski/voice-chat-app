@@ -25,7 +25,7 @@ router.post('/register', passport.authenticate('local-register', {
   failureFlash: true
 }));
 
-router.post('/logout', function (req, res) {
+router.post('/logout', authenticate, (req, res) => {
   req.logout();
   res.redirect('/');
 });

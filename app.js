@@ -10,16 +10,14 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var flash = require('connect-flash');
 var hbs = require('hbs');
-
-var {passport} = require('./middleware/authentication/passport');
-var {mongoose} = require('./db/mongoose');
-
 // routes
 var index = require('./routes/index');
 var account = require('./routes/account');
 var chat = require('./routes/chat');
-var users = require('./routes/users');
 
+var {passport} = require('./middleware/authentication/passport');
+var {mongoose} = require('./db/mongoose');
+var {isAuthenticated} = require('./middleware/authentication/is-authenticated');
 // helpers
 var getCurrentYearHelper = require('./helpers/view-helpers/current-year');
 
@@ -41,15 +39,7 @@ hbs.registerPartials(__dirname + '/views/partials');
 hbs.registerHelper(getCurrentYearHelper.name, getCurrentYearHelper.getCurrentYear());
 
 // check if user is authenticated
-app.use(function (req, res, next) {
-  res.locals.isAuthenticated = req.isAuthenticated();
-  if(req.user){
-    res.locals.user = {_id: req.user._id, email: req.user.email};
-  }
-
-  next();
-});
-
+app.use(isAuthenticated);
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -58,26 +48,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser(session_secret));
 
-
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(enviroment);
 
 app.use('/', index);
 app.use('/chat', chat);
-app.use('/users', users);
 app.use('/account', account);
 
-
-
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : err.status;
