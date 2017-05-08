@@ -1,6 +1,7 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var {User} = require('../../models/user');
+var _ = require('lodash');
 
 // passport session setup
 passport.serializeUser(function (user, done) {
@@ -26,6 +27,10 @@ passport.use('local-register', new LocalStrategy({
       if (user) {
         return done(null, false, req.flash('error', 'That email is already registered'));
       } else {
+        let body = _.pick(req.body, ['email', 'password', 'confirmPassword']);
+        if(body.password !== body.confirmPassword){
+          return done(null, false, req.flash('error', "Passwords doesn't match"));
+        }
         let newUser = new User();
         newUser.email = email;
         newUser.password = newUser.generateHash(password);
