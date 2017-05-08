@@ -9,6 +9,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var flash = require('connect-flash');
+var hbs = require('hbs');
 
 var {passport} = require('./middleware/authentication/passport');
 var {mongoose} = require('./db/mongoose');
@@ -18,6 +19,9 @@ var index = require('./routes/index');
 var account = require('./routes/account');
 var chat = require('./routes/chat');
 var users = require('./routes/users');
+
+// helpers
+var getCurrentYearHelper = require('./helpers/view-helpers/current-year');
 
 var app = express();
 var session_secret = 'keyboard cat';
@@ -33,10 +37,16 @@ app.use(passport.session());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+hbs.registerPartials(__dirname + '/views/partials');
+hbs.registerHelper(getCurrentYearHelper.name, getCurrentYearHelper.getCurrentYear());
 
 // check if user is authenticated
 app.use(function (req, res, next) {
   res.locals.isAuthenticated = req.isAuthenticated();
+  if(req.user){
+    res.locals.user = {_id: req.user._id, email: req.user.email};
+  }
+
   next();
 });
 

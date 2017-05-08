@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var {passport} = require('../middleware/authentication/passport');
+let {authenticate} = require('./../middleware/authentication/authenticate');
 
 router.get('/login', (req, res) => {
   res.render('account/login', {message: req.flash('error')});
@@ -29,10 +30,7 @@ router.post('/logout', function (req, res) {
   res.redirect('/');
 });
 
-router.get('/details', (req, res) => {
-  if (!req.isAuthenticated()) {
-    res.redirect('/account/login');
-  }
+router.get('/details', authenticate, (req, res) => {
   res.render('account/details');
 });
 

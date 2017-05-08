@@ -1,5 +1,8 @@
+<h2>Create new account</h2>
 {{#if message}}
-    <p class="alert-danger">{{message}}</p>
+    <div class="alert alert-danger">
+        <strong>Error!</strong> {{message}}
+    </div>
 {{/if}}
 <form action="/account/register" method="post" class="form-horizontal">
     <h4>Use a local account to log in.</h4>

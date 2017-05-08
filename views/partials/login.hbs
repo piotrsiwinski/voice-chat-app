@@ -1,0 +1,18 @@
+{{#if user}}
+    <form method="post" id="logoutForm" action="/account/logout"
+          class="navbar-right">
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="/account/details" title="Manage">Hello, {{user.email}}!</a>
+            </li>
+            <li>
+                <button type="submit" class="btn btn-link navbar-btn navbar-link">Log out</button>
+            </li>
+        </ul>
+    </form>
+{{else}}
+    <ul class="nav navbar-nav navbar-right">
+        <li><a href='/account/register'>Register</a></li>
+        <li><a href='/account/login'>Login</a></li>
+    </ul>
+{{/if}}
