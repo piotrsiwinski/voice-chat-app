@@ -1,10 +1,12 @@
 <h1>{{title}}</h1>
 <p>Welcome to {{title}}</p>
 
-<button id="start-chat-button" class="btn btn-primary"> Start chat</button>
+<button id="start-chat-button" class="btn btn-primary">Start chat</button>
+<div id="messages"></div>
 <p id="login"></p>
-<video id="localVideo" autoplay muted></video>
+<video id="localVideo" width="600" height="600" autoplay muted></video>
 <div id="remotes"></div>
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="/js/windowScreen.js" type="text/javascript"></script>
 <script src="/js/client.js" type="text/javascript"></script>

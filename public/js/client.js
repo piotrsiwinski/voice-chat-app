@@ -4,32 +4,155 @@ function onDocumentReady(){
     $("#start-chat-button").click(startChatButtonOnClick);
 }
 
-function startChatButtonOnClick(){
-    configureSocketIO();
+var socket = null;
+
+function startChatButtonOnClick() {
+    configureSocketIO("camera");
     $(this).hide();
 }
 
-function configureSocketIO() {
-    var socket = io.connect(window.location.origin);
+function streamWindowButtonOnClick(){
+    if(socket !== null)
+    {
+        clearRemotes();
+        socket.disconnect(); socket = null;
+        configureSocketIO("window");
+    }
+}
+
+function defaultStream() {
+    clearRemotes();
+    socket.disconnect(); socket = null;
+    configureSocketIO("camera");
+}
+
+function clearRemotes() {
+
+    if(window.localStream !== null && window.localStream !== undefined && window.localStream.getAudioTracks().length > 0) window.localStream.getAudioTracks()[0].stop();
+    if(window.localStream !== null && window.localStream !== undefined && window.localStream.getVideoTracks().length > 0) window.localStream.getVideoTracks()[0].stop();
+
+    let remoteVideos = document.getElementById("remotes");
+    while (remoteVideos.firstChild) {
+        remoteVideos.removeChild(remoteVideos.firstChild);
+    }
+
+    let messages = document.getElementById("messages");
+    while (messages.firstChild) {
+        messages.removeChild(messages.firstChild);
+    }
+
+    let buttons = document.getElementById("buttons");
+    let btnCamera = document.getElementById("btnCamera");
+
+    if(btnCamera !== null) buttons.removeChild(btnCamera);
+}
+
+function generateMessage(id, type, text, buttons) {
+
+    let panel = document.createElement('div');
+        panel.setAttribute("class", "panel panel-" + type);
+        panel.setAttribute("id", id);
+
+    let panelH = document.createElement('div');
+        panelH.setAttribute("class", "panel-heading");
+        panelH.innerText = "UWAGA";
+
+        panel.appendChild(panelH);
+
+    let panelB = document.createElement('div');
+        panelB.setAttribute("class", "panel-body");
+
+    let panelT = document.createElement('p');
+        panelT.innerText = text;
+
+        panelB.appendChild(panelT);
+        panel.appendChild(panelB);
+
+    let panelF = document.createElement('div');
+        panelF.setAttribute("class", "panel-footer");
+
+    buttons.forEach(function(button, index){
+
+        let panelBtn = document.createElement('button');
+            panelBtn.setAttribute("type", "button"); 
+            panelBtn.setAttribute("class", "btn btn-" + button.type);
+            panelBtn.setAttribute("id", "panelBtn-"+ index);
+            panelBtn.setAttribute("style", "margin-right: 4px; margin-bottom: 4px;");
+            panelBtn.innerHTML = button.text;
+
+            panelBtn.onclick = button.callBack;
+
+        panelF.appendChild(panelBtn);
+    });
+
+    panel.appendChild(panelF);
+
+    document.getElementById("messages").appendChild(panel);
+}
+
+function configureSocketIO(type) {
 
     /***********************************************************************************************************************/
     /* DOSTĘP DO MULTIMEDIÓW - UTWORZENIE LOKALNEGO STREAMU I WYŚWIETLENIE GO */
 
-    navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
-    })
-        .then(function (stream) {
-            document.getElementById("localVideo").srcObject = stream;
-            window.localStream = stream;
-            var url = window.location.href.split("/");
-            var roomName = url[url.length-1];
+    socket = io.connect('http://localhost:3000');
+  
+    if(type === "camera") navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(function(stream) {
+    
+        document.getElementById("localVideo").srcObject = stream;
+        window.localStream = stream;
 
-            socket.emit('hello', roomName);
-        })
-        .catch(function (e) {
-            console.log('getUserMedia() error: ', e);
-        });
+        var url = window.location.href.split("/");
+        var roomName = url[url.length-1];
+
+        socket.emit('hello', roomName);
+
+        generateMessage('success', 'success', 'Udostępniasz podgląd ze swojej kamery. Jeśli chcesz pokazać dowolne okno, wciśnij przycisk poniżej i wybierz je.', [
+            {type: 'primary', text: 'Podgląd okna', callBack: function(){ $("#success").hide(); streamWindowButtonOnClick(); }}
+            ]);
+
+    }).catch(function(err) {
+        generateMessage('error', 'danger', 'Błąd dostępu do mediów: ' + err.name, [
+            {type: 'danger', text: 'Spróbuj ponownie', callBack: function(){ $("#error").hide(); defaultStream(); }},
+            {type: 'primary', text: 'Podgląd okna', callBack: function(){ $("#error").hide(); streamWindowButtonOnClick(); }}
+            ]);
+    });
+    else getScreenId(function (error, sourceId, screen_constraints) {
+
+        if(error === null){
+
+            generateMessage('success', 'success', 'Udostępniasz podgląd wybranego okna. Jeśli chcesz pokazać inne okno, wciśnij [przycisk 1] i wybierz je. Jeśli chcesz powrócić do podglądu z kamery, wciśnij [przycisk 2].', [
+            {type: 'primary', text: 'Podgląd innego okna', callBack: function(){ $("#success").hide(); streamWindowButtonOnClick(); }},
+            {type: 'success', text: 'Podgląd z kamery', callBack: function(){ $("#success").hide(); defaultStream(); }}
+            ]);
+
+            navigator.mediaDevices.getUserMedia(screen_constraints).then(function(stream) {
+            
+                document.getElementById("localVideo").srcObject = stream;
+                window.localStream = stream;
+
+                var url = window.location.href.split("/");
+                var roomName = url[url.length-1];
+
+                socket.emit('hello', roomName);
+
+            }).catch(function(err) {
+                generateMessage('error', 'danger', 'Błąd przy próbie uzyskania podglądu okna: ' + err.name, [
+                    {type: 'danger', text: 'Spróbuj ponownie', callBack: function(){ $("#error").hide(); streamWindowButtonOnClick(); }},
+                    {type: 'primary', text: 'Podgląd z kamery', callBack: function(){ $("#error").hide(); defaultStream(); }}
+                ]);
+            });
+        }
+        else {
+            // error  ==  'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
+            if(error == 'not-installed') {
+                generateMessage('warning', 'warning', 'Nie posiadasz rozszerzenia dla chrome, które umożliwia udostępnianie podglądu wybranego okna. Możesz powrócić do podglądu z kamery, wciskając [przycisk 1] lub zainstalować rozszerzenie, wciskając [przycisk 2]', [
+                    {type: 'primary', text: 'Podgląd z kamery', callBack: function(){ $("#warning").hide(); defaultStream(); }},
+                    {type: 'success', text: 'Przejdź do strony z rozszerzeniem', callBack: function(){ $("#warning").hide(); window.location.href = "https://chrome.google.com/webstore/detail/screen-capturing/ajhifddimkapgcifgcodmmfdlknahffk";}}
+                ]);
+            }
+        }
+    });
 
     /***********************************************************************************************************************/
     /*
