@@ -95,7 +95,9 @@ function configureSocketIO(type) {
     /***********************************************************************************************************************/
     /* DOSTĘP DO MULTIMEDIÓW - UTWORZENIE LOKALNEGO STREAMU I WYŚWIETLENIE GO */
 
-    socket = io.connect('http://localhost:3000');
+    socket = io.connect(window.location.origin);
+        var socket = io.connect(window.location.origin);
+
   
     if(type === "camera") navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(function(stream) {
     
