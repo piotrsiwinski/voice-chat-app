@@ -8,7 +8,7 @@
   "development": {
     "NODE_ENV": "development",
     "PORT": 3000,
-    "MONGODB_URI": "mongodb://localhost:27017/DbDev",
+    "MONGODB_URI": "mongodb://localhost:27017/voice_chat_db",
     "JWT_SECRET": "secret"
   }
 }

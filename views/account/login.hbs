@@ -1,0 +1,45 @@
+<h2>Login</h2>
+{{#if message}}
+    <div class="alert alert-danger">
+        <strong>Error!</strong> {{message}}
+    </div>
+{{/if}}
+<div class="row">
+    <div class="col-md-8">
+        <section>
+            <form action="/account/login" method="post" class="form-horizontal">
+                <h4>Use a local account to log in.</h4>
+                <hr/>
+
+                <div class="form-group">
+                    <label for="Email" class="col-md-2 control-label">Email: </label>
+                    <div class="col-md-10">
+                        <input id="Email" type="email" class="form-control" name="email"/>
+                        <span class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Password" class="col-md-2 control-label">Password: </label>
+                    <div class="col-md-10">
+                        <input id="Password" type="password" class="form-control" name="password"/>
+                        <span class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <button type="submit" class="btn btn-default">Log in</button>
+                    </div>
+                </div>
+
+                <p>
+                    <a href="/account/register">Register as a new user?</a>
+                </p>
+                <p>
+                    <a href="#">Forgot your password?</a>
+                </p>
+            </form>
+        </section>
+    </div>
+</div>
