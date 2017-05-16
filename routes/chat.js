@@ -5,22 +5,32 @@ const {Room} = require('./../models/room');
 let {authenticate} = require('./../middleware/authentication/authenticate');
 
 router.get('/', authenticate, (req, res) => {
-  res.render('chat/index', {title: 'Chat'});
+  res.render('chat/index', {title: 'Chat', error: req.flash('error')});
 });
+
 
 router.post('/', authenticate, (req, res) => {
   const body = _.pick(req.body, ['name', 'password']);
-  let room = new Room(body.name, body.password);
+  Room.findOne({name: body.name}).then(room => {
+    if (!room) {
+      let newRoom = new Room(body);
 
-  if (!room.name) {
-    return res.render('chat/index', {
-      title: 'Chat',
-      errors: {
-        name: 'Name cannot be empty'
+      return newRoom.save().then(() => {
+        req.flash('room', 'OK');
+        res.redirect(301, `/chat/${body.name}`);
+      });
+    } else {
+      if (!room.validPassword(body.password)) {
+        req.flash('error', 'Wrong password');
+        return res.redirect('/chat');
       }
-    });
-  }
-  res.redirect(`/chat/${room.name}`);
+      req.flash('room', 'OK');
+      return res.redirect(301, `/chat/${body.name}`);
+    }
+  }).catch(e => {
+    req.flash('error', e.toString());
+    res.redirect('/chat');
+  });
 });
 
 router.get('/room', authenticate, (req, res) => {
@@ -28,9 +38,15 @@ router.get('/room', authenticate, (req, res) => {
 });
 
 router.get('/:name', authenticate, (req, res) => {
-  let roomName = req.params['name'];
+  let room = req.flash().room;
 
-  res.render('chat/room', {title: roomName});
+  if(!room){
+    req.flash('error', 'Type password');
+    return res.redirect('/chat');
+  }
+  let roomName = req.params['name'];
+  return res.render('chat/room', {title: roomName});
+
 });
 
 module.exports = router;
