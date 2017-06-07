@@ -5,8 +5,15 @@
 
 var app = require('../app');
 var debug = require('debug')('voice-chat:server');
-var http = require('http');
+// var http = require('http');
 let {serverSocketIO} = require('./../video/server');
+var https = require('https');
+var fs = require('fs');
+
+var options = {
+  key: fs.readFileSync('./key.pem'),
+  cert: fs.readFileSync('./cert.pem')
+};
 
 /**
  * Get port from environment and store in Express.
@@ -18,7 +25,9 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+// var server = http.createServer(app);
+
+var server = https.createServer(options, app);
 var io = require('socket.io')(server);
 
 /**
@@ -30,6 +39,8 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 serverSocketIO(io);
+
+
 
 /**
  * Normalize a port into a number, string, or false.
